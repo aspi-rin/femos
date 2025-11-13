@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Button } from "@heroui/react";
+import { Moon, Sun, Monitor, LogIn, LogOut } from "lucide-react";
 import { ThemeContext } from "../theme/ThemeProvider";
 
 export function Header({ onLoginClick, onLogout, isAuthenticated }: {
@@ -16,15 +17,27 @@ export function Header({ onLoginClick, onLogout, isAuthenticated }: {
     setThemePref(next);
   };
 
+  const ThemeIcon = () => {
+    if (themePref === "dark") return <Moon size={20} />;
+    if (themePref === "light") return <Sun size={20} />;
+    return <Monitor size={20} />;
+  };
+
   return (
     <div className="flex items-center justify-between px-4 py-3">
       <div className="text-xl font-semibold">Femos 书摘分享</div>
       <div className="flex items-center gap-2">
-        <Button variant="flat" onPress={cycleTheme}>{themePref}</Button>
+        <Button isIconOnly aria-label="主题切换" variant="flat" onPress={cycleTheme}>
+          <ThemeIcon />
+        </Button>
         {isAuthenticated ? (
-          <Button color="danger" onPress={onLogout}>退出登录</Button>
+          <Button isIconOnly aria-label="退出登录" color="danger" onPress={onLogout}>
+            <LogOut size={20} />
+          </Button>
         ) : (
-          <Button color="primary" onPress={onLoginClick}>登录</Button>
+          <Button isIconOnly aria-label="登录" color="primary" onPress={onLoginClick}>
+            <LogIn size={20} />
+          </Button>
         )}
       </div>
     </div>

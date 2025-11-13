@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button, Card } from "@heroui/react";
+import { Shuffle } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 
 type Memo = { id: string; content: string; title: string; author: string };
@@ -38,13 +39,15 @@ export function RandomMemo({ reloadSignal }: { reloadSignal?: number }) {
         {error && <div className="text-danger">{error}</div>}
         {!loading && !error && memo && (
           <div>
-            <div className="text-lg whitespace-pre-line">{memo.content}</div>
+            <div className="text-lg whitespace-pre-line text-left">{memo.content}</div>
             <div className="mt-3 text-sm text-foreground/70">— {memo.author}《{memo.title}》</div>
           </div>
         )}
         {!loading && !error && !memo && <div>暂无内容</div>}
       </Card>
-      <Button color="primary" onPress={fetchRandom}>换一句</Button>
+      <Button isIconOnly aria-label="换一句" color="primary" onPress={fetchRandom}>
+        <Shuffle size={20} />
+      </Button>
     </div>
   );
 }
