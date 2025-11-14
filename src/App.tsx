@@ -124,6 +124,25 @@ export default function App() {
     return () => clearTimeout(t);
   }, [toast]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const key = e.key;
+      if (key === " " || key === "Spacebar" || e.code === "Space") {
+        if (e.repeat) return;
+        const target = e.target as HTMLElement | null;
+        const tag = target?.tagName?.toLowerCase();
+        const editable = !!target?.isContentEditable;
+        const inForm = editable || tag === "input" || tag === "textarea" || tag === "select";
+        if (inForm) return;
+        if (loginOpen || addOpen || showResetPassword) return;
+        e.preventDefault();
+        setReloadSignal((n) => n + 1);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [loginOpen, addOpen, showResetPassword]);
+
   const handleResetPassword = async () => {
     console.log('开始重置密码流程');
     
