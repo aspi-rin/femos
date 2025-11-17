@@ -5,6 +5,8 @@ import { RandomMemo } from "./components/RandomMemo";
 import { FAB } from "./components/FAB";
 import { AddMemosDialog } from "./components/AddMemosDialog";
 import { ResetPasswordDialog } from "./components/ResetPasswordDialog";
+import { BooksListDialog } from "./components/BooksListDialog";
+import { BookMemosDialog } from "./components/BookMemosDialog";
 import { supabase } from "./lib/supabaseClient";
 import { AppThemeProvider } from "./theme/ThemeProvider";
 
@@ -15,6 +17,9 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [reloadSignal, setReloadSignal] = useState(0);
   const [showResetPassword, setShowResetPassword] = useState(false);
+  const [booksListOpen, setBooksListOpen] = useState(false);
+  const [bookMemosOpen, setBookMemosOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<{ id: string; title?: string; author?: string } | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then((result) => {
@@ -152,11 +157,25 @@ export default function App() {
     await supabase.auth.signOut();
   };
 
+  const handleBooksClick = () => {
+    setBooksListOpen(true);
+  };
+
+  const handleBookSelect = (bookId: string, bookTitle?: string, bookAuthor?: string) => {
+    setSelectedBook({ id: bookId, title: bookTitle, author: bookAuthor });
+    setBookMemosOpen(true);
+  };
+
 
   // 渲染主应用界面
   const renderMainApp = () => (
     <div className="min-h-screen flex flex-col">
-      <Header onLoginClick={() => setLoginOpen(true)} onLogout={logout} isAuthenticated={isAuthenticated} />
+      <Header
+        onLoginClick={() => setLoginOpen(true)}
+        onLogout={logout}
+        isAuthenticated={isAuthenticated}
+        onBooksClick={handleBooksClick}
+      />
       <div className="flex-1 flex items-center justify-center">
         <RandomMemo reloadSignal={reloadSignal} />
       </div>
@@ -175,6 +194,22 @@ export default function App() {
         open={showResetPassword}
         onClose={() => setShowResetPassword(false)}
         onSuccess={() => setToast("密码重置成功")}
+      />
+      <BooksListDialog
+        open={booksListOpen}
+        onClose={() => setBooksListOpen(false)}
+        onBookSelect={handleBookSelect}
+      />
+      <BookMemosDialog
+        open={bookMemosOpen}
+        onClose={() => setBookMemosOpen(false)}
+        onBack={() => {
+          setBookMemosOpen(false);
+          setBooksListOpen(true);
+        }}
+        bookId={selectedBook?.id || null}
+        bookTitle={selectedBook?.title}
+        bookAuthor={selectedBook?.author}
       />
       {toast && (
         <div className="fixed top-5 right-5 z-50">
