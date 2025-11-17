@@ -15,9 +15,9 @@ export interface BookMemo {
 }
 
 /**
- * 获取用户阅读过的书籍列表
+ * 获取所有书籍列表
  */
-export async function getUserBooks(userId: string): Promise<UserBook[]> {
+export async function getUserBooks(): Promise<UserBook[]> {
   // 首先获取所有有memo的书籍
   const { data: booksData, error: booksError } = await supabase
     .from("books")

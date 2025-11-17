@@ -34,11 +34,27 @@ export default function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      // 确保正确处理不同的事件类型
-      if (session) {
-        setSession(session);
-      } else if (_event === 'SIGNED_OUT' || _event === 'TOKEN_REFRESHED' && !session) {
-        setSession(null);
+      console.log('Auth state changed:', _event, session);
+
+      // 处理所有认证状态变化
+      switch (_event) {
+        case 'SIGNED_IN':
+        case 'TOKEN_REFRESHED':
+        case 'USER_UPDATED':
+          if (session) {
+            setSession(session);
+          }
+          break;
+        case 'SIGNED_OUT':
+          setSession(null);
+          break;
+        default:
+          // 对于其他事件，如果有session则设置，否则清除
+          if (session) {
+            setSession(session);
+          } else {
+            setSession(null);
+          }
       }
     });
 
@@ -154,7 +170,30 @@ export default function App() {
   }, [session]);
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      // 首先清除本地状态
+      setSession(null);
+
+      // 清除本地存储的认证信息
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
+
+      // 尝试服务器端登出，但忽略可能的错误
+      try {
+        await supabase.auth.signOut();
+      } catch (serverError) {
+        console.log('服务器端登出失败，但本地状态已清除');
+      }
+
+      setToast('已成功登出');
+    } catch (error) {
+      console.error('登出过程中发生错误:', error);
+      // 无论如何都清除本地状态
+      setSession(null);
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
+      setToast('已登出（本地状态已清除）');
+    }
   };
 
   const handleBooksClick = () => {

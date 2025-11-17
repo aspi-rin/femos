@@ -25,14 +25,12 @@ export function Header({ onLoginClick, onLogout, isAuthenticated, onBooksClick }
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex items-center justify-between px-4 py-3 relative z-10">
       <div className="text-xl font-semibold">Femos 书摘分享</div>
       <div className="flex items-center gap-2">
-        {isAuthenticated && (
-          <Button isIconOnly aria-label="我的书库" variant="flat" onPress={onBooksClick}>
-            <Book size={20} />
-          </Button>
-        )}
+        <Button isIconOnly aria-label="我的书库" variant="flat" onPress={onBooksClick}>
+          <Book size={20} />
+        </Button>
         <Button isIconOnly aria-label="主题切换" variant="flat" onPress={cycleTheme}>
           <ThemeIcon />
         </Button>

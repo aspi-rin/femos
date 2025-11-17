@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner, Card, CardBody } from "@heroui/react";
 import { Book, ChevronRight } from "lucide-react";
 import { UserBook, getUserBooks } from "../lib/userBooksService";
-import { supabase } from "../lib/supabaseClient";
 
 interface BooksListDialogProps {
   open: boolean;
@@ -14,27 +13,17 @@ export function BooksListDialog({ open, onClose, onBookSelect }: BooksListDialog
   const [books, setBooks] = useState<UserBook[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [session, setSession] = useState<any>(null);
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data?.session);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (open && session?.user?.id) {
+    if (open) {
       loadBooks();
     }
-  }, [open, session]);
+  }, [open]);
 
   const loadBooks = async () => {
-    if (!session?.user?.id) return;
-
     setLoading(true);
     setError(null);
     try {
-      const userBooks = await getUserBooks(session.user.id);
+      const userBooks = await getUserBooks();
       setBooks(userBooks);
     } catch (e: any) {
       setError(e?.message || "获取书籍列表失败");
