@@ -18,14 +18,14 @@ export interface BookMemo {
  * 获取所有书籍列表
  */
 export async function getUserBooks(): Promise<UserBook[]> {
-  // 首先获取所有有memo的书籍
+  // 获取所有书籍，直接使用 memo_count 缓存字段
   const { data: booksData, error: booksError } = await supabase
     .from("books")
     .select(`
       id,
       title,
       author,
-      memos(count)
+      memo_count
     `)
     .order("title");
 
@@ -39,7 +39,7 @@ export async function getUserBooks(): Promise<UserBook[]> {
     book_id: book.id,
     title: book.title,
     author: book.author,
-    memo_count: book.memos?.[0]?.count || 0,
+    memo_count: book.memo_count || 0,
   }));
 
   return userBooks;
